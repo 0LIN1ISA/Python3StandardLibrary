@@ -165,3 +165,134 @@ print(Timer('a,b=b,a', 'a=1;b=2').timeit())
 """
 11. 质量控制
 """
+
+
+# doctest：提供了一个工具，扫描模块并根据程序中内嵌的文档字符串执行测试。
+# 测试构造如同简单的将它的输出结果剪切并黏贴到文档字符串中。
+
+def average(values):
+    """Computes the arithmetic mean of a list of numbers.
+    >>> print(average([20,30,70]))
+    40.0
+    """
+    return sum(values) / len(values)
+
+
+import doctest
+
+print(doctest.testmod(verbose=True))
+
+# unittest：可以在一个独立的文件里提供一个更全面的测试集
+import unittest
+
+
+class TestStatisticalFunctions(unittest.TestCase):
+
+    def test_average(self):
+        self.assertEqual(average([20, 30, 70]), 40.0)
+        self.assertEqual(round(average([1, 5, 7]), 1), 4.3)
+        with self.assertRaises(ZeroDivisionError):
+            average([])
+        with self.assertRaises(TypeError):
+            average(20, 30, 70)
+
+
+"""
+12. 瑞士军刀
+"""
+# xmlrpc.client和xmlrpc.server：远程过程调用
+# email：一个管理邮件信息的库，包括MIME和其它基于RFC2822的信息文档，不同于smtplib和poplib模块
+# email包含了一个构造或者解析复杂消息结构（包括附件）以及实现互联网编码和头协议的完整工具集。
+# xml.dom和xml.sax：为流行的信息交换格式提供了强大的支持
+# gettext，locale和codecs：对国际化的支持
+
+"""
+13. 输出格式
+"""
+# reprlib：为大型的或深度嵌套的容器缩写显示提供了：repr()函数的一个定制版本
+import reprlib
+
+print(set('supercalifragilisticexpialidocious'))
+print(reprlib.repr(set('supercalifragilisticexpialidocious')))
+
+# pprint：提供了一种解释器可读的方式深入控制内置和用户自定义对象的打印（美化打印）
+import pprint
+
+t = [[[['black', 'cyan'], 'white', ['green', 'red']], [['magenta', 'yellow'], 'blue']]]
+print(t)
+pprint.pprint(t, width=20)
+
+# textwrap：格式化文本段落以适应特定的屏宽
+import textwrap
+
+doc = """
+The wrap() method is just like fill() except that it returns 
+a list of strings instead of one big string with newlines to separate 
+the wrapped lines.
+"""
+# 文本段落换行宽度为40
+print(textwrap.fill(doc, width=40))
+
+# locale：按访问预定好的国家信息数据库，locale的格式化函数属性集提供了一个直接方式以分组标示格式化数字
+import locale
+
+print(locale.setlocale(locale.LC_ALL, 'English_United States.1252'))
+
+"""
+14. 模版
+"""
+# string提供了一个灵活多变的模版类Template，使用它最终用户可以用简单的进行编辑。
+# 格式用$为开头的Python合法标识（数字、字母和下划线）作为占位符。$$创建一个单独$。
+from string import Template
+
+t = Template('${village}folk send $$10 to $cause.')
+print(t.substitute(village='Nottingham', cause='the ditch fund'))
+# ...
+# Nottinghamfolk send $10 to the ditch fund.
+
+# t.safe_substitute()：当占位符不完整的情况，此函数不会抛出KeyError异常
+
+# 模板子类可以指定一个自定义分隔符
+
+"""
+15. 使用二进制数据记录布局
+"""
+# struct：模块为使用变长的二进制记录格式提供了pack()和unpack()函数。
+
+"""
+16. 多线程
+"""
+# threading：多线程模块
+import threading, zipfile
+
+
+class AsyncZip(threading.Thread):
+    def __init__(self, infile, outfile):
+        threading.Thread.__init__(self)
+        self.infile = infile
+        self.outfile = outfile
+
+    def run(self):
+        f = zipfile.ZipFile(self.outfile, 'w', zipfile.ZIP_DEFLATED)
+        f.write(self.infile)
+        f.close()
+        print('Finished background zip of:', self.infile)
+
+background = AsyncZip('example.py','example.zip')
+background.start()
+print('The main program continues to run in foreground.')
+background.join()
+print('Main programe waited until background was done.')
+
+"""
+17. 日志
+"""
+# loggin：提供了完整和灵活的日志系统
+import logging
+logging.debug('Debugging information')
+logging.error('Error occurred')
+
+"""
+18. 弱引用
+"""
+
