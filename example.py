@@ -278,7 +278,8 @@ class AsyncZip(threading.Thread):
         f.close()
         print('Finished background zip of:', self.infile)
 
-background = AsyncZip('example.py','example.zip')
+
+background = AsyncZip('example.py', 'example.zip')
 background.start()
 print('The main program continues to run in foreground.')
 background.join()
@@ -289,10 +290,113 @@ print('Main programe waited until background was done.')
 """
 # loggin：提供了完整和灵活的日志系统
 import logging
+
 logging.debug('Debugging information')
 logging.error('Error occurred')
 
 """
 18. 弱引用
 """
+# weakref：提供了不用创建引用的跟踪对象工具，一丹对象不再存在，它自动从弱引用上删除并触发回调。
 
+import weakref
+
+
+class ExpensiveObject:
+    def __del__(self):
+        print('(Deleting %s' % self)
+
+
+obj = ExpensiveObject
+r = weakref.ref(obj)
+
+print('obj', obj)
+print('ref', r)
+print('r():', r())
+
+print('deleting obj')
+del obj
+print('ref', r)
+print('r():', r())
+# 在这里,由于obj在第二次调用引用之前已经删除，所以ref返回None
+
+
+import weakref, gc
+
+
+class A():
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self) -> str:
+        return str(self.value)
+
+
+x = A(3)
+y = x
+print(x)
+del x
+print(y)
+
+
+class B():
+
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return str(self.value)
+
+
+a = B(10)
+d = weakref.WeakValueDictionary()
+d['primary'] = a
+print(d['primary'])
+print(gc.collect())
+del a
+print(gc.collect())
+print(d['primary'])
+
+"""
+19. 列表工具
+"""
+# array：模块提供了一个类似列表的array()对象，它存储数据更为紧凑。
+from array import array
+
+a = array('H', [4000, 10, 700, 22222])
+print(sum(a))
+print(a[1:3])
+
+# collections：模块提供了类似列表的deque()对象，他从左边添加（append）和弹出(pop)更快。
+from collections import deque
+
+d = deque(['task1', 'task2', 'task3'])
+d.append('task4')
+print(d)
+print('Handling', d.popleft())
+
+# heapq：提供了基于正规链表的堆实现。最小的值总是保持在0点。
+# 这在希望循环访问最小元素，但是不想执行完整堆排序的时候非常有用。
+from heapq import heapify, heappop, heappush
+
+data = [1, 3, 5, 7, 9, 2, 4, 6, 8, 0]
+# 以线性时间将一个列表转换为堆
+heapify(data)
+# 往堆中插入一条新数据-5
+heappush(data, -5)
+print([heappop(data) for i in range(3)])
+
+"""
+20. 十进制浮点数算法
+"""
+# decimal：模块提供了一个Decimal数据类型用于浮点数计算。
+# 相比内置的二进制浮点数实现float，这个类型有助于
+# * 金融应用和其他需要精度十进制表达的场合
+# * 控制精度
+# * 控制舍入以使用法律或者法规要求
+# * 确保十进制数位精度
+# * 用户希望计算结果与手算相符合的场合。
+from decimal import *
+
+print(round(Decimal('0.70') * Decimal('1.05'), 2))
+print(round(.70 * 1.05, 2))
